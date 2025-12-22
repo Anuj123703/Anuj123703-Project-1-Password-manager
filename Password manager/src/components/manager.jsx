@@ -1,53 +1,105 @@
 import React, { useState, useEffect } from 'react'
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const Manager = () => {
-
-    const [showpassword, setshowpassword] = useState(false);
+    // input states
     const [URL, setURL] = useState("");
     const [username, setUsername] = useState("");
     const [Password, setPassword] = useState("");
+    // passwords array state
     const [passwords, setPasswords] = useState([]);
-
+    // show password state
+    const [showpassword, setshowpassword] = useState(false);
+    // edit state
+    const [isedit, setedit] = useState(false);
+    const [editingindex, seteditingindex] = useState(null);
+    //edit function
+    const edittext = (index) => {
+        const p = passwords[index];
+        setURL(p.URL)
+        setUsername(p.username);
+        setPassword(p.Password);
+        setedit(true);
+        seteditingindex(index);
+    };
+    //save password function
     const savedpasswords = () => {
+        // Validate inputs
         if (!URL || !username || !Password) {
             alert("All field required")
             return;
         }
-        const newPassword = { URL, username, Password };
-        const updatedPassword = [...passwords, newPassword];
+        // Edit existing password
+        if (isedit) {
+            const updatedPasswords = [...passwords];
+            updatedPasswords[editingindex] = { URL, username, Password };
+            // Update state and localStorage
+            setPasswords(updatedPasswords);
+            localStorage.setItem("passwords", JSON.stringify(updatedPasswords));
+            // Reset edit state
+            setedit(false);
+            seteditingindex(null);
+        }
+        else {
+            // Add new password
+            const updatedPasswords = [...passwords, { URL, username, Password }];
+            setPasswords(updatedPasswords);
+            localStorage.setItem('passwords', JSON.stringify(updatedPasswords));
+        }
 
-        setPasswords(updatedPassword);
-        localStorage.setItem("passwords", JSON.stringify(updatedPassword));
-
+        // Clear inputs
         setURL("");
         setUsername("");
         setPassword("");
     }
+    // Load passwords from localStorage on component mount
     useEffect(() => {
         const savedpasswords = JSON.parse(localStorage.getItem("passwords"));
         if (savedpasswords) {
             setPasswords(savedpasswords);
         }
     }, [])
-
+    // delete password function
     const deletePassword = (index) => {
         const updatedPasswords = passwords.filter((_, i) => i !== index);
         setPasswords(updatedPasswords);
         localStorage.setItem("passwords", JSON.stringify(updatedPasswords));
 
     }
+    // copy to clipboard function
     const copytext = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
-            alert("Copied to clipboard!");
+            toast.success('copied succesfully', {
+                position: "top-left",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            });
         } catch (err) {
             console.error("Copy failed", err);
         }
     };
-    
+
     return (
         <>
+            <ToastContainer
+                position="top-left"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick={false}
+                rtl
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
             <div className="pb-20 min-h-screen scroll-smooth  " >
                 <div className='my_contaainer m-5'>
                     <h1 className='text-4xl text font-bold text-center' >
@@ -155,6 +207,17 @@ const Manager = () => {
                                 </td>
                                 <td>
                                     <button
+                                        className='p-3'
+                                        onClick={() => edittext(index)} >
+                                        <lord-icon
+                                            src="https://cdn.lordicon.com/exymduqj.json"
+                                            trigger="hover"
+                                            stroke="bold"
+                                            colors="primary:#000000,secondary:#000000"
+                                            className="w-5 h-5">
+                                        </lord-icon>
+                                    </button>
+                                    <button
                                         onClick={() => deletePassword(index)}  >
                                         <lord-icon
                                             src="https://cdn.lordicon.com/oqeixref.json"
@@ -163,6 +226,7 @@ const Manager = () => {
                                             className="inline-block w-5 h-5 ml-1" >
                                         </lord-icon>
                                     </button>
+
                                 </td>
                             </tr>
                         ))}
@@ -170,7 +234,7 @@ const Manager = () => {
                 </table>
 
 
-            </div>
+            </div >
         </>
     )
 }
