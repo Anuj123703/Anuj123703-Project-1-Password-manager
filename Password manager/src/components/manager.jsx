@@ -180,10 +180,10 @@ const Manager = () => {
                         <lord-icon
                             src="https://cdn.lordicon.com/efxgwrkc.json"
                             trigger="hover">
-                        </lord-icon>Add Password
+                        </lord-icon>Save
                     </button>
                 </div>
-                <table className=" table-fixed mt-5 mx-auto w-11/13 rounded-lg overflow-hidden [&_td]:max-w-xs [&_td]:break-words [&_td]:whitespace-normal" >
+                <table className=" mt-5 mx-auto rounded-lg overflow-hidden [&_td]:max-w-xs [&_td]:break-words [&_td]:whitespace-normal" >
                     <thead className='bg-slate-800 text-white text-center ' >
                         <tr>
                             <th className='text-center py-2 px-4 w-1/3' >URLs</th>
