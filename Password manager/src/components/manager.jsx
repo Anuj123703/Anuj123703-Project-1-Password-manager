@@ -7,13 +7,17 @@ const Manager = () => {
     const [URL, setURL] = useState("");
     const [username, setUsername] = useState("");
     const [Password, setPassword] = useState("");
-    // passwords array state
+    // passwords array
     const [passwords, setPasswords] = useState([]);
     // show password state
     const [showpassword, setshowpassword] = useState(false);
     // edit state
     const [isedit, setedit] = useState(false);
     const [editingindex, seteditingindex] = useState(null);
+    // popup state
+    const [showpopup, setShowpopup] = useState(false);
+    const [deleteindex, setDeleteindex] = useState(null);
+
     //edit function
     const edittext = (index) => {
         const p = passwords[index];
@@ -60,13 +64,28 @@ const Manager = () => {
             setPasswords(savedpasswords);
         }
     }, [])
+
     // delete password function
     const deletePassword = (index) => {
-        const updatedPasswords = passwords.filter((_, i) => i !== index);
+        setDeleteindex(index)
+        setShowpopup(true);
+    }
+    // confirm delete function
+    const confirmDelete = () => {
+        const updatedPasswords = passwords.filter((_, i) => i !== deleteindex);
         setPasswords(updatedPasswords);
         localStorage.setItem("passwords", JSON.stringify(updatedPasswords));
 
+        setShowpopup(false);
+        setDeleteindex(null)
+
     }
+    // cancel delete function
+    const cancelDelete = () => {
+        setShowpopup(false);
+        setDeleteindex(null);
+    };
+
     // copy to clipboard function
     const copytext = async (text) => {
         try {
@@ -232,9 +251,40 @@ const Manager = () => {
                         ))}
                     </tbody>
                 </table>
-
-
             </div >
+            {showpopup && (
+                <div className="fixed top-0 z-50 border border-black w-full  ">
+
+                    <div className="bg-slate-800 rounded-xl shadow-xl w-80 p-6 text-center mx-auto">
+
+                        <h2 className="text-white text-lg font-bold text-center mb-2">
+                            Confirm Delete
+                        </h2>
+
+                        <p className="text-white text-center mb-5">
+                            Are you sure you want to delete this password?
+                        </p>
+
+                        <div className="flex justify-between">
+                            <button
+                                onClick={cancelDelete}
+                                className="px-4 py-1 rounded-full bg-green-100 hover:scale-105 transition-transform duration-200"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-1 rounded-full bg-green-600 text-white hover:scale-105 transition-transform duration-200"
+                            >
+                                Delete
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
         </>
     )
 }
