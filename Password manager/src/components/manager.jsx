@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
+import "../App.css"
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const Manager = () => {
@@ -17,7 +19,8 @@ const Manager = () => {
     // popup state
     const [showpopup, setShowpopup] = useState(false);
     const [deleteindex, setDeleteindex] = useState(null);
-
+    // delete all passwords popup state
+    const [showdeleteallpopup, setshowdeleteallpopup] = useState(false)
     //edit function
     const edittext = (index) => {
         const p = passwords[index];
@@ -85,6 +88,19 @@ const Manager = () => {
         setShowpopup(false);
         setDeleteindex(null);
     };
+    // delete all passwords function
+    const handleDeleteAll = () => {
+        setshowdeleteallpopup(true);
+    }
+    const ConfirmDeleteAll = () => {
+        setPasswords([]);
+        localStorage.removeItem("passwords");
+        setshowdeleteallpopup(false);
+    }
+    const CancelDeleteAll = () => {
+        setshowdeleteallpopup(false);
+    }
+
 
     // copy to clipboard function
     const copytext = async (text) => {
@@ -130,27 +146,27 @@ const Manager = () => {
 
                 </div>
 
-                <div className='flex flex-col items-center gap-3 ' >
+                <div className='flex flex-col items-center gap-4 px-4 ' >
                     <label htmlFor="URL" className='sr-only' >URL</label>
                     <input
                         type="text"
                         id='URL'
                         placeholder='Enter website URL'
-                        className='border border-green-800 rounded-full w-1/2 p-1 px-4'
+                        className='border border-green-800 rounded-full w-full md:w-1/2 p-2 px-4'
                         value={URL}
                         onChange={(e) => setURL(e.target.value)}
                     />
-                    <div className='w-full flex gap-4 justify-center' >
+                    <div className='w-full flex flex-col md:flex-row gap-4 justify-center item0center' >
                         <label htmlFor="username" className='sr-only' >Username</label>
                         <input
                             type="text"
                             id='username'
                             placeholder='Username'
-                            className='border border-green-800  rounded-full p-1 px-4 w-1/4'
+                            className='border border-green-800 rounded-full p-2 px-4 w-full md:w-1/4 '
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                         />
-                        <div className="relative w-1/5 ">
+                        <div className="relative w-full md:w-1/5">
                             <label htmlFor="Password" className='sr-only' >Password</label>
                             <input
                                 type={showpassword ? "text" : "password"}
@@ -183,77 +199,110 @@ const Manager = () => {
                         </lord-icon>Save
                     </button>
                 </div>
-                <table className=" mt-5 mx-auto rounded-lg overflow-hidden [&_td]:max-w-xs [&_td]:break-words [&_td]:whitespace-normal" >
-                    <thead className='bg-slate-800 text-white text-center ' >
-                        <tr>
-                            <th className='text-center py-2 px-4 w-1/3' >URLs</th>
-                            <th className='text-center py-2 px-4 w-1/6' >Usernames</th>
-                            <th className='text-center py-2 px-4 w-1/6' >Passwords</th>
-                            <th className='text-center py-2 px-4 w-1/6' >Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {passwords.map((item, index) => (
-                            <tr key={index}
-                                className='odd:bg-green-100 even:bg-white text-center ' >
-                                <td>
-                                    <a href={item.URL}
-                                        target="_blank"
-                                        rel="noopener noreferrer"  >
-                                        {item.URL}
-                                    </a>
-                                </td>
-                                <td>{item.username}
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/cfkiwvcc.json"
-                                        trigger="hover"
-                                        colors="primary:#16c72e"
-                                        className="inline-block w-3 h-3 ml-1"
-                                        onClick={() => copytext(item.username)}
-                                    >
-                                    </lord-icon>
-                                </td>
-                                <td>{item.Password}
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/cfkiwvcc.json"
-                                        trigger="hover"
-                                        colors="primary:#16c72e"
-                                        className="inline-block w-3 h-3 ml-1"
-                                        onClick={() => copytext(item.Password)}
-                                    >
-                                    </lord-icon>
-
-                                </td>
-                                <td>
-                                    <button
-                                        className='p-3'
-                                        onClick={() => edittext(index)} >
-                                        <lord-icon
-                                            src="https://cdn.lordicon.com/exymduqj.json"
-                                            trigger="hover"
-                                            stroke="bold"
-                                            colors="primary:#000000,secondary:#000000"
-                                            className="w-5 h-5">
-                                        </lord-icon>
-                                    </button>
-                                    <button
-                                        onClick={() => deletePassword(index)}  >
-                                        <lord-icon
-                                            src="https://cdn.lordicon.com/oqeixref.json"
-                                            trigger="hover"
-                                            colors="primary:#16c72e"
-                                            className="inline-block w-5 h-5 ml-1" >
-                                        </lord-icon>
-                                    </button>
-
-                                </td>
+                <div className=' w-full m-2 p-2 flex flex-col items-center ' >
+                    <table className="w-[80%] m-2 p-2 table-fixed border-collapse" >
+                        <thead className='bg-slate-800 text-white ' >
+                            <tr>
+                                <th className='w-[40%] py-2 px-2' >URLs</th>
+                                <th className='w-[25%] py-2 px-2' >Usernames</th>
+                                <th className='w-[25%] py-2 px-2' >Passwords</th>
+                                <th className='w-[10%]' >Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {passwords.length === 0 ? (
+                                <tr>
+                                    <td
+                                        colSpan="4"
+                                        className="text-center py-4 text-slate-500" >
+                                        No passwords saved yet...
+                                    </td>
+                                </tr>
+                            ) : (
+
+                                passwords.map((item, index) => (
+                                    <tr key={index}
+                                        className='odd:bg-green-100 even:bg-white text-center ' >
+                                        <td className="px-2 py-1 text-sm break-words whitespace-normal">
+
+                                            <a href={item.URL}
+                                                target="_blank"
+                                                rel="noopener noreferrer"  >
+                                                {item.URL}
+                                            </a>
+                                        </td>
+                                        <td className="px-2 py-1 text-sm break-words whitespace-normal">
+
+                                            {item.username}
+                                            <lord-icon
+                                                src="https://cdn.lordicon.com/cfkiwvcc.json"
+                                                trigger="hover"
+                                                colors="primary:#16c72e"
+                                                className="inline-block w-3 h-3 ml-1"
+                                                onClick={() => copytext(item.username)}
+                                            >
+                                            </lord-icon>
+                                        </td>
+                                        <td className="px-2 py-1 text-sm break-words whitespace-normal">
+
+                                            {item.Password}
+                                            <lord-icon
+                                                src="https://cdn.lordicon.com/cfkiwvcc.json"
+                                                trigger="hover"
+                                                colors="primary:#16c72e"
+                                                className="inline-block w-3 h-3 ml-1"
+                                                onClick={() => copytext(item.Password)}
+                                            >
+                                            </lord-icon>
+
+                                        </td>
+                                        <td className="flex flex-col gap-2 md:flex-row ">
+                                            <button
+                                                className='p-1 border-2 border-green-600 rounded-lg bg-white'
+                                                onClick={() => edittext(index)} >
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/exymduqj.json"
+                                                    trigger="hover"
+                                                    stroke="bold"
+                                                    colors="primary:#000000,secondary:#000000"
+                                                    className="w-5 h-5">
+                                                </lord-icon>
+                                            </button>
+                                            <button
+                                                className='p-1 border-2 border-slate-800 rounded-lg bg-slate-800'
+                                                onClick={() => deletePassword(index)}  >
+                                                <lord-icon
+                                                    src="https://cdn.lordicon.com/oqeixref.json"
+                                                    trigger="hover"
+                                                    colors="primary:#16c72e"
+                                                    className="inline-block w-5 h-5 ml-1" >
+                                                </lord-icon>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+
+
+                            )}
+                        </tbody>
+                    </table>
+                    <div className="w-full text-center ">
+                        <button
+                            className=' bg-slate-800 p-2 m-2 text-white rounded-full hover:bg-slate-600 '
+                            onClick={handleDeleteAll}  >
+                            <lord-icon
+                                src="https://cdn.lordicon.com/oqeixref.json"
+                                trigger="hover"
+                                colors="primary:#16c72e"
+                                className="inline-block w-5 h-5 ml-1 p-1 gap-2" >
+                            </lord-icon>
+                            .. Delete All Passwords
+                        </button>
+                    </div>
+                </div>
             </div >
             {showpopup && (
-                <div className="fixed top-0 z-50 border border-black w-full  ">
+                <div className="fixed top-0 z-50 w-full  ">
 
                     <div className="bg-slate-800 rounded-xl shadow-xl w-80 p-6 text-center mx-auto">
 
@@ -284,6 +333,37 @@ const Manager = () => {
                     </div>
                 </div>
             )}
+
+            {showdeleteallpopup && (
+                <div
+                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 
+                             backdrop-blur-sm transition-opacity duration-300 ease-out"
+                >
+                    <div className="bg-slate-800 rounded-xl shadow-2xl p-6 w-80 max-w-full
+                                  transform scale-95 opacity-0 
+                                  animate-popup">
+                        <h2 className="text-white text-lg font-bold text-center mb-4">Confirm Delete All..?</h2>
+                        <p className="text-center text-white mb-6">
+                            Are you sure you want to delete all passwords..? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-between gap-4">
+                            <button
+                                className="flex-1 bg-gray-300 hover:bg-gray-400 transition-colors text-gray-800 font-semibold py-2 rounded-full"
+                                onClick={CancelDeleteAll}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="flex-1 bg-green-700 hover:bg-red-700 transition-colors text-white font-semibold py-2 rounded-full"
+                                onClick={ConfirmDeleteAll}
+                            >
+                                Delete All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
 
         </>
     )
